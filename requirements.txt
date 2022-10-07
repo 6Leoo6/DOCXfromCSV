@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pathlib
+python-multipart
+jinja2
+swig
+mangum
+python-docx

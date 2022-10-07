@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <script src="/static/js/index.js" defer></script>
+    <title></title>
+</head>
+<body>
+    <div class="center"><h1>DOCX generátor</h1></div>
+    <div class="center">
+        <p id="short-des">Generálj word dokumentumokat egy csv fájl soraiból!</p>
+    </div>
+    <form action="" id="upload-form">
+        <div class="center vertical-flex">
+            <input type="file" name="uploadfile" id="csv-input" accept="application/csv" style="display:none;"/>
+            <label class="btn" for="csv-input">Tölts fel egy CSV fájlt</label>
+            <p id="filename-display-csv">Nincs fájl kiválasztva</p>
+
+            <input type="file" name="uploadfile" id="model-input" accept="application/DOCX" style="display:none;"/>
+            <label class="btn" for="model-input">Tölts fel egy sablont</label>
+            <p id="filename-display-model">Nincs fájl kiválasztva</p>
+
+            <button type="submit" class="btn" id="submit">Átalakítás</button>
+            <p class="warning" id="no-file-warn" hidden>Tötls fel mindegyikhez egy fájlt</p>
+            <div class="loader" id="converting-loader" hidden></div>
+            <a id="file-downloader" hidden>Nyomj ide a fájl letöltéséhez</a>
+        </div>
+    </form>
+</body>
+</html>
