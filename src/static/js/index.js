@@ -44,6 +44,7 @@ form.addEventListener("submit", async function (event) {
   csv_reader.onload = () => checkIfLoaded()
   model_reader.onload = () => checkIfLoaded()
 
+  //If a file is loaded then send the request, if not set the var to true
   function checkIfLoaded() {
     if(isloaded) {
       sendRequest();
