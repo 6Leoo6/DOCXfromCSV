@@ -1,6 +1,6 @@
-from docx import Document
 from io import BytesIO
 from zipfile import ZipFile
+from xml.dom import minidom
 
 
 async def convertCSV(csv, model):
@@ -12,51 +12,54 @@ async def convertCSV(csv, model):
     csv = csv_bytes.decode('utf-8').replace('\r', '').split('\n')
     csv = list(map(lambda x: x.split(','), csv))
 
-    # Separate the first row from the others
-    headers = csv.pop(0)
-    rows = csv
+    # Separate the first row (Headers) from the others
+    csv_headers = csv.pop(0)
+    csv_rows = csv
 
-    # Load the word doc
-    doc = Document(model_bytes)
-    # Create an empty zip file
     zip_bytes = BytesIO()
-    # Write into the zip variable
     with ZipFile(zip_bytes, 'w') as zip:
-        # Loop through the rows
-        for csv_row in rows:
-            full_doc = []
-            #Set the filenamne to the first value of the row
-            filename = csv_row[0]
+        for row in csv_rows:
+            files = []
+            doc_xml = BytesIO()
+            filename = row[0]
 
-            # Loop through each paragraph found in the model
-            for i, paragraph in enumerate(doc.paragraphs):
-                # Parse the paragraph text
-                paragraph = paragraph.text
-                
-                #Loop through each column title found in the csv
-                for col, header in enumerate(headers):
-                    #Replace the title with the corresponding value
-                    paragraph = paragraph.replace(
-                        '${'+header+'}', csv_row[col])
-                #If it's the first line of the model and it starts with [ and ends with ] then set the filename to it
-                if i == 0 and paragraph.startswith('[') and paragraph.endswith(']'):
-                    #Remove the square brackets from both ends
-                    filename = paragraph.strip('[]')
-                    continue
-                #If it's not the filename then add it to the list of paragraphs
-                full_doc.append(paragraph)
+            with ZipFile(model_bytes, 'r') as doc:
+                for file in doc.filelist:
+                    fname = file.filename
+                    if fname == 'word/document.xml':
+                        doc_xml = doc.read(fname).decode('utf-8')
+                        continue
+                    files.append([fname, doc.read(fname)])
 
-            #Create an empty document
-            generated_doc = Document()
-            #Loop through the parsed paragraphs
-            for paragraph in full_doc:
-                #Add back the paragraphs
-                generated_doc.add_paragraph(paragraph)
-            #Save the doc into memory
+            
+            for col, header in enumerate(csv_headers):
+                print(header, col)
+                # Replace the title with the corresponding value
+                doc_xml = doc_xml.replace(header, row[col])
+                # If it's the first line of the model and it starts with [ and ends with ] then set the filename to it
+
+            xml = minidom.parseString(doc_xml)
+            body = xml.firstChild.firstChild
+            first_p = ''
+            try:
+                for child in body.firstChild.childNodes:
+                    first_p += child.firstChild.firstChild.nodeValue
+                if first_p.startswith('[') and first_p.endswith(']'):
+                    # Remove the square brackets from both ends
+                    filename = first_p.strip('[]')
+                    body.removeChild(body.firstChild)
+            except (AttributeError, TypeError):
+                pass
+            doc_xml = xml.toxml()
+
             doc_bytes = BytesIO()
-            generated_doc.save(doc_bytes)
-            #Add the file to the zip archive
+            with ZipFile(doc_bytes, 'w') as doc:
+                for fname, file in files:
+                    if fname != 'word/document.xml':
+                        doc.writestr(fname, file)
+                doc.writestr('word/document.xml', doc_xml)
+
             zip.writestr(f'{filename}.docx', doc_bytes.getvalue())
 
-    #Return the bytes of the zip
+    # Return the bytes of the zip
     return zip_bytes.getvalue()
