@@ -11,7 +11,8 @@ from csvtodocx import convertCSV
 app = FastAPI()
 handler = Mangum(app)
 
-templates = Jinja2Templates(directory=Path(Path(__file__).parent.parent.absolute() / 'src/templates'))
+templates = Jinja2Templates(directory=Path(
+    Path(__file__).parent.parent.absolute() / 'src/templates'))
 
 origins = ["*"]
 
@@ -25,11 +26,14 @@ app.add_middleware(
 
 app.mount(
     "/static",
-    StaticFiles(directory=Path(__file__).parent.parent.absolute() / 'src/static'), #Path(__file__).parent.parent.absolute()
+    StaticFiles(directory=Path(__file__).parent.parent.absolute() /
+                'src/static'),  # Path(__file__).parent.parent.absolute()
     name="static",
 )
 
 # -------------------------------------HTML Templates-------------------------------------
+
+
 @app.get('/')
 def login(req: Request):
     return templates.TemplateResponse('index.html', {'request': req})
@@ -38,9 +42,8 @@ def login(req: Request):
 # --------------------------------------API Requests--------------------------------------
 @app.post("/convert_to_docx")
 async def upload_file(request: Request, csv: UploadFile = File(...), model: UploadFile = File(...)):
-    zip_bytes = await convertCSV(csv, model)    
+    zip_bytes = await convertCSV(csv, model)
     return Response(content=zip_bytes, media_type="application/zip")
-
 
 
 # To run the app for development: python -m uvicorn server:app --host 0.0.0.0 --reload
