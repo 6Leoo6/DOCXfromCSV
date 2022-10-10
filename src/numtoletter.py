@@ -1,7 +1,5 @@
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 N = len(ALPHABET)
-ALPHABET_INDEX = {d: i for i, d in enumerate(ALPHABET, 1)}
-
 
 def int_to_letter(num):
     if num == 0:
