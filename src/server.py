@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
-from csvtodocx import convertCSV
+from exceltodocx import convertXLSX
 
 app = FastAPI()
 handler = Mangum(app)
@@ -42,7 +42,7 @@ def login(req: Request):
 # --------------------------------------API Requests--------------------------------------
 @app.post("/convert_to_docx")
 async def upload_file(request: Request, csv: UploadFile = File(...), model: UploadFile = File(...)):
-    zip_bytes = await convertCSV(csv, model)
+    zip_bytes = await convertXLSX(csv, model)
     return Response(content=zip_bytes, media_type="application/zip")
 
 

@@ -73,7 +73,7 @@ form.addEventListener("submit", async function (event) {
     downloadLink.setAttribute("href", fileURL);
     downloadLink.setAttribute(
       "download",
-      `${csvInput.files[0].name.slice(0, -4)}.zip`
+      `${csvInput.files[0].name.slice(0, -5)}.zip`
     );
     downloadLink.hidden = false;
   };
