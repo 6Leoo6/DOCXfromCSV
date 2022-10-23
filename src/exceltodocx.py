@@ -1,10 +1,12 @@
 from io import BytesIO
-from zipfile import ZipFile
+from random import choice
+from string import ascii_letters, digits
 from xml.dom import minidom
+from zipfile import ZipFile
 
-from openpyxl import load_workbook
-
+import boto3
 from app.numtoletter import int_to_letter
+from openpyxl import load_workbook
 
 
 async def convertXLSX(excel_file, model_file):
@@ -90,5 +92,29 @@ async def convertXLSX(excel_file, model_file):
             #Save the file as a docx to the main zip
             zip.writestr(f'{filename}.docx', doc_bytes.getvalue())
 
-    # Return the bytes of the main zip
-    return zip_bytes.getvalue()
+    zip_bytes.seek(0)
+
+    # Upload to s3
+    return upload_to_s3(zip_bytes)
+
+
+def upload_to_s3(file: BytesIO):
+    bucket_name = 'uploaded-files-docx-from-excel'
+
+    s3 = boto3.client("s3")
+
+    existing_names = [key['Key'] for key in s3.list_objects(Bucket=bucket_name)['Contents']]
+    while True:
+        obj_name = ''.join([choice(ascii_letters + digits) for _ in range(15)]) + '.zip'
+        if obj_name not in existing_names:
+            break
+
+    s3.upload_fileobj(file, bucket_name, obj_name)
+
+    url = s3.generate_presigned_url('get_object',
+                                    Params={'Bucket': bucket_name,
+                                            'Key': obj_name},
+                                    ExpiresIn=3600
+    )
+
+    return url

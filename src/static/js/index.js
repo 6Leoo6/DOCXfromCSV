@@ -64,17 +64,21 @@ form.addEventListener("submit", async function (event) {
     //Sending the request with fetch
     var res = await fetch(url, { method: "POST", body: formData });
 
-    //Creating a download link for the .zip file
-    const file = await res.blob();
-    const fileURL = URL.createObjectURL(file);
+    //Parsing the download link
+    var json = await res.json()
+    const fileURL = json["url"]
 
+    //Hiding the loader
     loader.hidden = true;
 
-    downloadLink.setAttribute("href", fileURL);
+    //Setting the filename and the url
     downloadLink.setAttribute(
       "download",
-      `${csvInput.files[0].name.slice(0, -5)}.zip`
+      `${fileInput.files[0].name.slice(0, -4)}.zip`
     );
+    downloadLink.setAttribute("href", fileURL);
+    
+    //Unhiding the link
     downloadLink.hidden = false;
   };
 });

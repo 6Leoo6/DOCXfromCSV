@@ -42,8 +42,8 @@ def login(req: Request):
 # --------------------------------------API Requests--------------------------------------
 @app.post("/convert_to_docx")
 async def upload_file(request: Request, csv: UploadFile = File(...), model: UploadFile = File(...)):
-    zip_bytes = await convertXLSX(csv, model)
-    return Response(content=zip_bytes, media_type="application/zip")
+    url = await convertXLSX(csv, model)    
+    return {'url': url}
 
 
 # To run the app for development: python -m uvicorn server:app --host 0.0.0.0 --reload
