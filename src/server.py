@@ -47,4 +47,3 @@ async def upload_file(request: Request, csv: UploadFile = File(...), model: Uplo
 
 
 # To run the app for development: python -m uvicorn server:app --host 0.0.0.0 --reload
-# To run the app on AWS: python3 -m uvicorn server:app

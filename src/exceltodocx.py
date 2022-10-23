@@ -18,7 +18,6 @@ async def convertXLSX(excel_file, model_file):
     # Separate the first row (Headers) from the others
     excel_headers = [excel.cell(row=1, column=col).value for col in range(1, excel.max_column+1)]
     excel_rows = [[str(excel.cell(row=row, column=col).value) for col in range(1, excel.max_column+1)] for row in range(2, excel.max_row+1)]
-    print(excel_rows)
 
     #Create a new empty zip in memory
     zip_bytes = BytesIO()
@@ -56,7 +55,6 @@ async def convertXLSX(excel_file, model_file):
             xml = minidom.parseString(doc_xml)
             #Get the body of the file
             body = xml.firstChild.firstChild
-            print(body.tagName)
             first_p = ''
             try:
                 #Reconstruct the first paragraph by looping through it and adding the values
@@ -66,7 +64,7 @@ async def convertXLSX(excel_file, model_file):
                     for c in child.childNodes:
                         if c.tagName != 'w:t':
                             continue
-                        first_p += child.firstChild.firstChild.nodeValue
+                        first_p += c.firstChild.nodeValue
                 #If the text start with and ends with a square bracket
                 if first_p.startswith('[') and first_p.endswith(']'):
                     #Set the parsed paragraph as the filename
