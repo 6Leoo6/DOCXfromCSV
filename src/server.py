@@ -6,13 +6,13 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
-from exceltodocx import convertXLSX
+from app.exceltodocx import convertXLSX
 
 app = FastAPI()
 handler = Mangum(app)
 
 templates = Jinja2Templates(directory=Path(
-    Path(__file__).parent.parent.absolute() / 'src/templates'))
+    Path(__file__).parent.parent.absolute() / 'app/templates'))
 
 origins = ["*"]
 
@@ -27,7 +27,7 @@ app.add_middleware(
 app.mount(
     "/static",
     StaticFiles(directory=Path(__file__).parent.parent.absolute() /
-                'src/static'),  # Path(__file__).parent.parent.absolute()
+                'app/static'),  # Path(__file__).parent.parent.absolute()
     name="static",
 )
 
